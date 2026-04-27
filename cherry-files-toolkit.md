@@ -11,6 +11,7 @@ Two separate bash CLI tools that together form a git file workflow toolkit:
 
 1. Now — Python: Enhance cherry-files-picker with the diff integration (show changed files as a selectable list, manual entry below). Publish to PyPI when ready.
 2. Later — Bash: Rewrite as a learning exercise, zero deps, distribution-friendly single file.
+3. Incorporate the search commit by title `git log --grep="commit title"`
 
 ---
 
