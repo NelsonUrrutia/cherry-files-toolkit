@@ -130,21 +130,69 @@ not a return value.
 
 > Lines 129 - 138
 
+This blocks finds the exact commit where `$BRANCH` split off
+from `$BASE`, store a short version of its hash, and prints
+the summary header to the terminal.
+
+`git merge-base BRANCH BASE`
+
+The git command to find the common ancestor commit, the point
+where the two branches diverged.
+Returns the commit hash.
+
+`MERGE_BASE_SHORT = "${MERGE_BASE:0:0}"`
+
+Then shorten the hash, by taking the first 8 characters
+
 ### Get all changed file
 
 > Lines 141 - 146
+
+Get the list of files that changed between the divergence point
+and the tip of `$BRANCH`. If there is nothing, tell the user
+exit cleanly.
+
+`git diff` compares two points in git history and shows what changed.
+
+`--name-status` limits the output to just the file name and its
+status letter, instead of showing the full line-by-line diff.
+
+`M -> Modified
+A -> Discarded
+D -> Deleted
+R -> Renamed`
 
 ### Parse into buckets
 
 > Lines 148 - 157
 
+Takes the raw diff output, split into three separate lists by status
+(Added, Modified, Deleted) count each one and sum them into total.
+
+`awk` is a text processing tool built into UNIX/Linux systems.
+Programming language designed specifically for processing structured
+text line by line. In `awk`, columns are automatically split by white
+space and references as `$1`, `$2`.
+
+In each `awk` command is saying:
+
+> If the first column is A, print the second column.
+
 ### Tree output
 
 > Lines 166 - 209
 
+Takes a flat list of files, groups them by their top-level folder,
+then prints everything as a nested tree using box-drawing characters
+— handling the last item at each level specially to use └── instead of ├──.
+
 ### Group output
 
 > Lines 212 - 232
+
+Same logic as the function as `print_as_tree` for grouping files
+by folder but instead of calculating three characters uses a
+simple indentation.
 
 ### Print result
 
