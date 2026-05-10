@@ -1,0 +1,9 @@
+.section {
+    height: 100%;
+    width: 1fr;
+    border: solid white;
+}
+
+.container{
+    border: solid white;
+  }

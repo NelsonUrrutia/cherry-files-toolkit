@@ -1,143 +1,62 @@
-from os import stat
-import subprocess
-import sys
-
-branch = "test-dir-print"
-base = "main"
-added_files = []
-modified_files = []
-deleted_files = []
+from textual.app import App, ComposeResult
+from textual.containers import Horizontal, Vertical
+from textual.suggester import SuggestFromList
+from textual.widgets import Header, Input, Label, Static
 
 
-# Guard must be inside a git repo
-git_dir_process = subprocess.run(
-    ["git", "rev-parse", "--git-dir"], capture_output=True, text=True
-)
-git_dir_process_return_code = git_dir_process.returncode
+branch_examples = [
+    "main",
+    "dev",
+    "feature/search-catalog",
+    "fix/css-improvements",
+    "feature/ai-integration"
+]
 
-if git_dir_process_return_code != 0:
-    print("Not inside a git repository")
-    sys.exit()
+class MyApp(App):
+    CSS_PATH = "my_app.tcss"
 
-merge_base_process = subprocess.run(
-    ["git", "merge-base", base, branch], capture_output=True, text=True
-)
-merge_base_commit = merge_base_process.stdout.replace("\n", "")
+    def compose(self) -> ComposeResult:
+        with Horizontal():
+            with Vertical(classes="section"):
+                yield Static("Cherry Files Diff")
+                with Horizontal():
+                    with Vertical(classes="container"):
+                        yield Label("Divergent branch")
+                        yield Input(suggester=SuggestFromList(branch_examples, case_sensitive=False))
+                    with Vertical(classes="container"):
+                        yield Label("Base branch")
+                        yield Input(suggester=SuggestFromList(branch_examples, case_sensitive=False))
+                with Horizontal(classes="container"):
+                    yield Static("Summary")
+                with Horizontal(classes="container"):
+                        yield Static("Diff Notes")
+            with Vertical(classes="section"):
+                yield Static("Cherry Files Picker")
+                with Horizontal():
+                    with Vertical(classes="container"):
+                        yield Label("Source branch")
+                        yield Input(suggester=SuggestFromList(branch_examples, case_sensitive=False))
+                    with Vertical(classes="container"):
+                        yield Label("Target branch")
+                        yield Input(suggester=SuggestFromList(branch_examples, case_sensitive=False))
+                with Horizontal(classes="container"):
+                    with Vertical():
+                        yield Static("Filters")
+                        yield Label("Search:")
+                        yield Input(suggester=SuggestFromList(branch_examples, case_sensitive=False))
 
-merge_base_short = merge_base_commit[0:8:1]
+                with Horizontal():
+                    with Vertical(classes="container"):
+                        yield Static("Candidate Files")
+                    with Vertical(classes="container"):
+                        yield Static("Selected Files")
+                with Horizontal(classes="container"):
+                    yield Static("Preview highligted candidate file")
+                with Horizontal(classes="container"):
+                    yield Static("Commit")
+                with Horizontal(classes="container"):
+                    yield Static("Git Output")
 
-
-diff_output_process = subprocess.run(
-    ["git", "diff", "--name-status", f"{merge_base_commit}..{branch}"],
-    capture_output=True,
-    text=True,
-)
-
-diff_lines = [line for line in diff_output_process.stdout.splitlines() if line.strip()]
-
-
-for line in diff_lines:
-    parts = line.split("\t")
-
-    if len(parts) < 2:
-        continue
-
-    status = parts[0]
-    path = parts[-1]
-
-    if status == "A":
-        added_files.append(path)
-    elif status == "M":
-        modified_files.append(path)
-    elif status == "D":
-        deleted_files.append(path)
-    elif status.startswith(("R", "C")):
-        modified_files.append(path)
-
-def build_directory_tree(paths):
-    tree = {}
-    for path in paths:
-        normalized = path.strip().strip("/")
-        if not normalized:
-            continue
-
-        parts = normalized.split("/")
-        node = tree
-        for dir_name in parts[:-1]:
-            node = node.setdefault(dir_name, {})
-        node.setdefault("__files__", set()).add(parts[-1])
-    return tree
-
-
-def print_tree_node(node):
-    for i, obj in node.items():
-        print(i)
-
-        for j in obj:
-            print(j)
-
-def print_directory_structure(paths, label=None):
-    if label:
-        print(label)
-
-    if not paths:
-        print("|---(none)")
-        return
-
-    tree = build_directory_tree(paths)
-    print_tree_node(tree)
-
-print_directory_structure(added_files, "ADDED")
-print_directory_structure(modified_files, "MODIFIED")
-print_directory_structure(modified_files, "DELTED")
-# for file in diff_output_files:
-#     if "A" in file:
-#         file_dir = file.replace("A::", "")
-#         added_files.append(file_dir)
-# 
-#     if "M" in file:
-#         file_dir = file.replace("M::", "")
-#         modified_files.append(file)
-# 
-#     if "D" in file:
-#         file_dir = file.replace("D::", "")
-#         deleted_files.append(file)
-
-
-# def get_parent_dirs(files):
-#     parent_dirs = []
-#     for item in files:
-#         split_path = item.split("/")
-#         if len(split_path) == 1:
-#             if "root" not in parent_dirs:
-#                 parent_dirs.append("root")
-#         else:
-#             parent_path = split_path[0]
-#             if parent_path not in parent_dirs:
-#                 parent_dirs.append(parent_path)
-#     return parent_dirs
-
-
-# def print_files(parent_dirs, files):
-#     for parent_dir in parent_dirs:
-#         print(f"{parent_dir}")
-#         for file in files:
-#             split_path = file.split("/")
-#             if len(split_path) == 1:
-#                 print(f"\n {file}")
-#             else:
-#                 inner_files = file.replace(f"{parent_dir}/", "")
-#                 print(f"\n {inner_files}")
-#         print("\n")
-
-
-# added_parent_dirs = get_parent_dirs(added_files)
-# modified_files_dirs = get_parent_dirs(modified_files)
-# deleted_files_dirs = get_parent_dirs(deleted_files)
-
-# print("ADDED")
-# print_files(added_parent_dirs, added_files)
-# print("MODIFIED")
-# print_files(modified_files_dirs, modified_files)
-# print("DELTED")
-# print_files(deleted_files_dirs, deleted_files)
+if __name__ == "__main__":
+    app = MyApp()
+    app.run()
