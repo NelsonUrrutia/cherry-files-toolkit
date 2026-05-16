@@ -1,7 +1,7 @@
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.suggester import SuggestFromList
-from textual.widgets import Header, Input, Label, Static
+from textual.widgets import Input, Label, Static
 
 
 branch_examples = [
