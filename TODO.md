@@ -2,9 +2,8 @@
 
 - Design the UI
   - Improve the layout with Textual
-  - Create independent widget for branch selector: Input and OptionList
-
-- Search how to devide the layout components
+  - Search how to devide the layout components
+  - Start getting input data to display the diff files
 
 - Implement the basic sh commands
 
