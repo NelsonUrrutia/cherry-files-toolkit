@@ -4,6 +4,7 @@ from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
 from textual.widgets import Button, Input, Label, Static
 
+from modules.cherry_files_diff import CherryFilesDiff
 from widgets.filterable_option_picker import FilterableOptionPicker
 
 class MyApp(App):
@@ -12,16 +13,7 @@ class MyApp(App):
 
     def compose(self) -> ComposeResult:
         with Horizontal():
-            with Vertical(classes="section"):
-                yield Static("Cherry Files Diff")
-                with Horizontal():
-                    yield FilterableOptionPicker(label="Divergent Branch", id="diff_divergent_branch")
-                    yield FilterableOptionPicker(label="Base Branch", id="diff_base_branch")
-                yield Button("Start Diff Checker", variant="primary", id="diff_checker_cta")
-                with Horizontal(classes="container"):
-                    yield Static("Summary")
-                with Horizontal(classes="container"):
-                        yield Static("Diff Notes")
+            yield CherryFilesDiff()            
             with Vertical(classes="section"):
                 yield Static("Cherry Files Picker")
                 with Horizontal():
@@ -46,32 +38,13 @@ class MyApp(App):
                 with Horizontal(classes="container"):
                     yield Static("Git Output")
 
-    def on_mount(self) -> None:
-        branches = self.get_branches()
-        self.query_one("#diff_divergent_branch", FilterableOptionPicker).set_items(branches)
-        self.query_one("#diff_base_branch", FilterableOptionPicker).set_items(branches)
-        self.query_one("#picker_source_branch", FilterableOptionPicker).set_items(branches)
-        self.query_one("#picker_target_branch", FilterableOptionPicker).set_items(branches)
+   # def on_mount(self) -> None:
+   #     branches = self.get_branches()
+   #     self.query_one("#diff_divergent_branch", FilterableOptionPicker).set_items(branches)
+   #     self.query_one("#diff_base_branch", FilterableOptionPicker).set_items(branches)
+   #     self.query_one("#picker_source_branch", FilterableOptionPicker).set_items(branches)
+   #     self.query_one("#picker_target_branch", FilterableOptionPicker).set_items(branches)
 
-
-    @on(Button.Pressed, "#diff_checker_cta")
-    def diff_checker_cta_handler(self) -> None:
-        divergent_branch = self.query_one("#diff_divergent_branch", FilterableOptionPicker).get_search_value()
-        base_branch = self.query_one("#diff_base_branch", FilterableOptionPicker).get_search_value()
-       
-        if divergent_branch == "" or base_branch == "":
-            self.notify("Please select a Divergent or Base branch", severity="warning", title="Diff Checker")
-            return
-
-        if divergent_branch == base_branch:
-            self.notify("Divergent and Base branch must be different", severity="warning", title="Diff Checker")
-            return
-        self.notify(f"divergent={divergent_branch} | base={base_branch}")
-
-    def get_branches(self):
-        result = subprocess.run(["git", "branch", "-l"], capture_output = True, text=True)
-        branches = [line.replace("*", "").strip() for line in result.stdout.splitlines()]
-        return branches
 
 if __name__ == "__main__":
     app = MyApp()

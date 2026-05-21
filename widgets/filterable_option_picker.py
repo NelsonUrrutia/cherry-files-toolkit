@@ -1,4 +1,3 @@
-from re import search
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Vertical

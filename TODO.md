@@ -1,13 +1,7 @@
 # TODO
 
-- Design the UI
-  - Improve the layout with Textual
-  - Search how to devide the layout components
-  - Start getting input data to display the diff files
-  - Create diff module
-  - Create git functions helper
-  - Create the search files component
+- Start diff files sh scripting on diff module
 
-- Implement the basic sh commands
+- Create the search files component
 
-- Add the cherry-files-picker core functions
+
