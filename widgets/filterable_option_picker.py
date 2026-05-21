@@ -1,7 +1,7 @@
+from re import search
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Vertical
-from textual.getters import query_one
 from textual.suggester import SuggestFromList
 from textual.widgets import Input, Label, OptionList
 
@@ -37,6 +37,8 @@ class FilterableOptionPicker(Vertical):
         search = self.query_one("#search", Input)
         search.suggester = SuggestFromList(self.items, case_sensitive=False)
 
+    def get_search_value(self) -> str:
+        return self.query_one("#search", Input).value
 
     @on(Input.Changed, "#search")
     def filter(self, event:Input.Changed) -> None:
