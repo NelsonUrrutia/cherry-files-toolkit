@@ -19,7 +19,7 @@ class CherryFilesDiff(Vertical):
                     yield FilterableOptionPicker(label="Divergent Branch", id="divergent_branch")
                     yield FilterableOptionPicker(label="Base Branch", id="base_branch")
                 yield Button("Start Diff Checker", id="start_diff_checker")
-            with Vertical():
+            with Vertical(classes="container"):
                 yield Label("Summary")
                 yield VerticalScroll(id="files_scroll_container")
 
@@ -54,9 +54,59 @@ class CherryFilesDiff(Vertical):
     async def files_diff(self, base:str, divergent:str) -> None:
         commit_id = get_divergence_point(base=base, branch=divergent)
         changed_files = get_all_changed_files(divergent=divergent, commit_id=commit_id)
-        await self.render_files(changed_files)
+        added_files, modified_files, deleted_files = self.parsed_files(changed_files)
+        await self.render_files(added_files, modified_files, deleted_files)
 
-    async def render_files(self, changed_files) -> None:
+
+    def parsed_files(self, changed_files):
+        added_files = []
+        modified_files = []
+        deleted_files = []
+
+        for line in changed_files:
+            parts = line.split("\t")
+
+            if len(parts) < 2:
+                continue
+
+            status = parts[0]
+            path = parts[-1]
+
+            if status == "A":
+                added_files.append(path)
+            if status == "M":
+                modified_files.append(path)
+            if status == "D":
+                deleted_files.append(path)
+            if status.startswith(("R", "C")):
+                modified_files.append(path)
+
+        return added_files, modified_files, deleted_files
+
+    async def render_files(self, added_files, modified_files, deleted_files) -> None:
         files_container = self.query_one("#files_scroll_container", VerticalScroll)
         await files_container.remove_children()
-        await files_container.mount_all(Label(p) for p in changed_files)
+
+        added_files_counter = len(added_files)
+        modified_files_counter = len(modified_files)
+        deleted_files_counter = len(deleted_files)
+ 
+        # SUMMARY
+        files_container.mount(Label(f"+{added_files_counter} created ~{modified_files_counter} modified -{deleted_files_counter} deleted"))
+
+        await self.render_tree_files("ADDED FILES", added_files)
+        await self.render_tree_files("MODIFIED FILES", modified_files)
+        await self.render_tree_files("DELETED FILES", deleted_files)
+
+    async def render_tree_files(self, label:str, files:list[str]) -> None:
+        files_container = self.query_one("#files_scroll_container", VerticalScroll)
+        await files_container.mount(Label(label))
+        await files_container.mount_all(Label(a) for a in files)
+
+
+
+
+
+
+
+
