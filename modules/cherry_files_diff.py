@@ -21,6 +21,7 @@ class CherryFilesDiff(Vertical):
                 yield Button("Start Diff Checker", id="start_diff_checker")
             with Vertical(classes="container"):
                 yield Label("Summary")
+                yield Label(id="summary_label")
                 yield VerticalScroll(id="files_scroll_container")
 
     def on_mount(self) -> None:
@@ -85,6 +86,7 @@ class CherryFilesDiff(Vertical):
 
     async def render_files(self, added_files, modified_files, deleted_files) -> None:
         files_container = self.query_one("#files_scroll_container", VerticalScroll)
+        summary_label = self.query_one("#summary_label", Label)
         await files_container.remove_children()
 
         added_files_counter = len(added_files)
@@ -92,15 +94,15 @@ class CherryFilesDiff(Vertical):
         deleted_files_counter = len(deleted_files)
  
         # SUMMARY
-        files_container.mount(Label(f"+{added_files_counter} created ~{modified_files_counter} modified -{deleted_files_counter} deleted"))
+        summary_label.update(f"+{added_files_counter} created ~{modified_files_counter} modified -{deleted_files_counter} deleted")
 
-        await self.render_tree_files("ADDED FILES", added_files)
-        await self.render_tree_files("MODIFIED FILES", modified_files)
-        await self.render_tree_files("DELETED FILES", deleted_files)
+        await self.render_tree_files("ADDED FILES", "green_text", added_files)
+        await self.render_tree_files("MODIFIED FILES", "yellow_text", modified_files)
+        await self.render_tree_files("DELETED FILES", "red_text", deleted_files)
 
-    async def render_tree_files(self, label:str, files:list[str]) -> None:
+    async def render_tree_files(self, label:str, label_class:str, files:list[str]) -> None:
         files_container = self.query_one("#files_scroll_container", VerticalScroll)
-        await files_container.mount(Label(label))
+        await files_container.mount(Label(label, classes=label_class))
         await files_container.mount_all(Label(a) for a in files)
 
 

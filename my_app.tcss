@@ -6,4 +6,18 @@
 
 .container{
     border: solid white;
+}
+
+.green_text{
+    color: green 100%
   }
+
+.yellow_text{
+    color: yellow 100%
+  }
+
+.red_text{
+    color: red 100%
+  }
+
+
