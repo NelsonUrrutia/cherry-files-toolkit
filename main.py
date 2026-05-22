@@ -1,8 +1,6 @@
-import subprocess
-from textual import on
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical
-from textual.widgets import Button, Input, Label, Static
+from textual.widgets import  Input, Label, Static
 
 from modules.cherry_files_diff import CherryFilesDiff
 from widgets.filterable_option_picker import FilterableOptionPicker
@@ -13,7 +11,7 @@ class MyApp(App):
 
     def compose(self) -> ComposeResult:
         with Horizontal():
-            yield CherryFilesDiff()            
+            yield CherryFilesDiff()
             with Vertical(classes="section"):
                 yield Static("Cherry Files Picker")
                 with Horizontal():

@@ -16,4 +16,13 @@ def get_branches() -> list[str]:
     branches = [line.replace("*","").strip() for line in result.stdout.splitlines()]
     return branches
 
+def get_divergence_point(base:str, branch:str) -> str:
+    result = subprocess.run(["git", "merge-base", base, branch], capture_output=True, text=True)
+    commit_id = result.stdout.strip()
+    commit_id = commit_id[:8]
+    return commit_id
 
+def get_all_changed_files(base:str, commit_id:str) -> list[str]:
+    result = subprocess.run(["git", "diff", "--name-status", f"{commit_id}..{base}"], capture_output=True, text=True)
+    lines = [line for line in result.stdout.splitlines() if line.strip()]
+    return lines
