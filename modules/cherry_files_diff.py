@@ -16,8 +16,8 @@ class CherryFilesDiff(Vertical):
             yield Label("Cherry Files Diff", variant="primary", expand=True)
             with Vertical():
                 with Horizontal():
-                    yield FilterableOptionPicker(label="Base Branch", id="base_branch")
                     yield FilterableOptionPicker(label="Divergent Branch", id="divergent_branch")
+                    yield FilterableOptionPicker(label="Base Branch", id="base_branch")
                 yield Button("Start Diff Checker", id="start_diff_checker")
             with Vertical():
                 yield Label("Summary")
@@ -53,10 +53,10 @@ class CherryFilesDiff(Vertical):
 
     async def files_diff(self, base:str, divergent:str) -> None:
         commit_id = get_divergence_point(base=base, branch=divergent)
-        changed_files = get_all_changed_files(base=base, commit_id=commit_id)
-        await self.categorized_files(changed_files)
+        changed_files = get_all_changed_files(divergent=divergent, commit_id=commit_id)
+        await self.render_files(changed_files)
 
-    async def categorized_files(self, changed_files) -> None:
+    async def render_files(self, changed_files) -> None:
         files_container = self.query_one("#files_scroll_container", VerticalScroll)
         await files_container.remove_children()
         await files_container.mount_all(Label(p) for p in changed_files)

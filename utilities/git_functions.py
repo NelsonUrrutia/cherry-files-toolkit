@@ -22,7 +22,7 @@ def get_divergence_point(base:str, branch:str) -> str:
     commit_id = commit_id[:8]
     return commit_id
 
-def get_all_changed_files(base:str, commit_id:str) -> list[str]:
-    result = subprocess.run(["git", "diff", "--name-status", f"{commit_id}..{base}"], capture_output=True, text=True)
+def get_all_changed_files(divergent:str, commit_id:str) -> list[str]:
+    result = subprocess.run(["git", "diff", "--name-status", f"{commit_id}..{divergent}"], capture_output=True, text=True)
     lines = [line for line in result.stdout.splitlines() if line.strip()]
     return lines
