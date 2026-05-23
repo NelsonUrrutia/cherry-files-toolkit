@@ -1,6 +1,8 @@
+from sys import prefix
 from textual.app import ComposeResult
 from textual import on
 from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.reactive import await_watcher
 from textual.widgets import Button, Label
 
 from utilities.git_functions import get_branches, get_divergence_point, get_all_changed_files
@@ -14,7 +16,7 @@ class CherryFilesDiff(Vertical):
     def compose(self) -> ComposeResult:
         with Vertical(classes="section"):
             yield Label("Cherry Files Diff", variant="primary", expand=True)
-            with Vertical():
+            with Vertical(classes="controls"):
                 with Horizontal():
                     yield FilterableOptionPicker(label="Divergent Branch", id="divergent_branch")
                     yield FilterableOptionPicker(label="Base Branch", id="base_branch")
@@ -103,9 +105,31 @@ class CherryFilesDiff(Vertical):
     async def render_tree_files(self, label:str, label_class:str, files:list[str]) -> None:
         files_container = self.query_one("#files_scroll_container", VerticalScroll)
         await files_container.mount(Label(label, classes=label_class))
-        await files_container.mount_all(Label(a) for a in files)
+        tree = self.build_tree(files)
+        await self.render_tree(tree)
 
+    def build_tree(self,files:list[str]):
+        tree = {}
+        for path in files:
+            node = tree
+            parts = path.split("/")
+            for part in parts:
+                if part not in node:
+                    node[part] = {}
+                node = node[part]
+        return tree
 
+    async def render_tree(self, tree, prefix=""):
+        files_container = self.query_one("#files_scroll_container", VerticalScroll)
+        entries = list(tree.items())
+        for i, (name, subtree) in enumerate(entries):
+            is_last = (i == len(entries) - 1)
+            connector = "└── " if is_last else "├── "
+            await files_container.mount(Label(prefix + connector + name))
+            self.log(prefix + connector + name)
+            if subtree:
+                 extension = "    " if is_last else "│   "
+                 await self.render_tree(subtree, prefix + extension)
 
 
 
