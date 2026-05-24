@@ -1,4 +1,86 @@
+.header{
+    padding: 1;
+    text-style: bold;
+    text-align: center;
+}
+
+.filterable_option_picker_unit{
+    height: auto;
+    margin-bottom: 0
+}
+
+
+#cherry_files_diff{
+    height: 100%;
+    width: 1fr;
+    padding: 1;
+}
+
+#cherry_files_diff_controls Label{
+  margin-left: 1;
+  text-style: bold;
+  margin-bottom: 1;
+}
+
+#cherry_files_diff_controls OptionList{
+  height: 1fr;
+  width: 100%;
+}
+
+#cherry_files_diff_summary{
+  border: solid white;
+  padding-left: 1;
+}
+
+#cherry_files_diff_summary_header{
+  margin-bottom: 0;
+  height: 1;
+}
+
+#cherry_files_diff_summary_header Label{
+  margin-right: 1;
+}
+
+#cherry_files_diff_summary_label{
+  text-style: bold;
+}
+
+#files_scroll_container{
+  padding-top: 1;
+}
+.parent_directory{
+    text-style: bold;
+  }
+.cherry_files_diff_added_files{
+    color: rgb(0, 255, 0);
+    text-style: bold;
+  }
+
+.cherry_files_diff_modified_files{
+    color: rgb(255, 255, 0);
+    text-style: bold;
+ }
+
+.cherry_files_diff_deleted_files{
+    color: rgb(255, 0, 0);
+    text-style: bold;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 .section {
+
     height: 100%;
     width: 1fr;
     border: solid white;
@@ -8,16 +90,8 @@
     border: solid white;
 }
 
-.green_text{
-    color: green 100%
-  }
 
-.yellow_text{
-    color: yellow 100%
-  }
 
-.red_text{
-    color: red 100%
-  }
+
 
 

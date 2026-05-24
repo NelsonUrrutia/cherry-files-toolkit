@@ -14,6 +14,7 @@ class FilterableOptionPicker(Vertical):
 
 
     def compose(self) -> ComposeResult:
+        with Vertical(classes="filterable_option_picker_unit"):
             yield Label(self.label)
             yield Input(suggester=SuggestFromList(self.items, case_sensitive=False), id="search")
             yield OptionList(id="options")

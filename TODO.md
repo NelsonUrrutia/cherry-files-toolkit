@@ -1,7 +1,6 @@
 # TODO
-
-- Start diff files sh scripting on diff module
-
-- Create the search files component
+- Start with cherry files picker module
+  - Create the search files component
+- Search for refactor oportunities
 
 
