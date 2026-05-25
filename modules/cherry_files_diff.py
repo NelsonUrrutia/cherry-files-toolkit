@@ -1,4 +1,3 @@
-from re import sub
 from textual.app import ComposeResult
 from textual import on
 from textual.containers import Horizontal, Vertical, VerticalScroll
@@ -12,7 +11,7 @@ class CherryFilesDiff(Vertical):
     def compose(self) -> ComposeResult:
         with Vertical(id="cherry_files_diff"):
             yield Label("Cherry Files Diff", classes="header", variant="primary", expand=True)
-            with Vertical(id="cherry_files_diff_controls"):
+            with Vertical(classes="branches_selector"):
                 with Horizontal():
                     yield FilterableOptionPicker(label="[1] Divergent Branch", id="divergent_branch", classes="container")
                     yield FilterableOptionPicker(label="[2] Base Branch", id="base_branch", classes="container")
