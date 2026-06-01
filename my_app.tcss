@@ -28,6 +28,11 @@
     border: solid white;
 }
 
+.section_label{
+    text-style: bold;
+    margin-left: 1;
+  }
+
 /*----------------------------*/
 /* MODULE | CHERRY FILES DIFF */
 /*----------------------------*/
@@ -80,13 +85,45 @@
     text-style: bold;
 }
 
-
-
-
-
+/*------------------------------*/
+/* MODULE | CHERRY FILES PICKER */
+/*------------------------------*/
 
 #cherry_files_picker{
     height: 100%;
     width: 1fr;
     padding: 1;
+}
+
+#cherry_files_tree_container{
+    height: 1fr;
+    min-height: 0;
+}
+
+#files_panel{
+    height: 1fr;
+    min-height: 0;
+}
+
+#cherry_files_tree_container Input{
+  margin: 1 0 0 0
+}
+
+#cherry_files_tree_container Label{
+  margin-left: 1;
+  margin-bottom: 1;
+  text-style: bold;
+}
+
+#cherry_files_tree_container Label.section_label{
+  margin-top: 1;
+  margin-left: 1;
+}
+
+#files_scroll_container{
+  height: 1fr;
+  min-height: 0;
+  overflow-y: auto;
+  padding-top: 0;
+  width: 100%;
 }

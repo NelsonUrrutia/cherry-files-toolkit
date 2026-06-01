@@ -12,7 +12,4 @@
 
 ## Cherry Pick Files
 
-- Start with cherry files picker module
-  - Create the search files component
-
-
+- Create commit UI section
