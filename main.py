@@ -1,7 +1,7 @@
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal
 
-# from modules.cherry_files_diff import CherryFilesDiff
+from modules.cherry_files_diff import CherryFilesDiff
 from modules.cherry_files_picker import CherryFilesPicker
 
 class MyApp(App):
@@ -9,7 +9,7 @@ class MyApp(App):
 
     def compose(self) -> ComposeResult:
         with Horizontal():
-            # yield CherryFilesDiff()
+            yield CherryFilesDiff()
             yield CherryFilesPicker()
 
 if __name__ == "__main__":

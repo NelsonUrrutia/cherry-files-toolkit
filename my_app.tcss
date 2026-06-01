@@ -25,7 +25,7 @@
 }
 
 .container{
-    border: solid white;
+    border: dashed white;
 }
 
 .section_label{
@@ -45,7 +45,7 @@
 
 
 #cherry_files_diff_summary{
-  border: solid white;
+  border: dashed white;
   padding-left: 1;
 }
 
@@ -60,6 +60,7 @@
 
 #cherry_files_diff_summary_label{
   text-style: bold;
+  margin-bottom: 1
 }
 
 #files_scroll_container{
@@ -111,13 +112,7 @@
 
 #cherry_files_tree_container Label{
   margin-left: 1;
-  margin-bottom: 1;
   text-style: bold;
-}
-
-#cherry_files_tree_container Label.section_label{
-  margin-top: 1;
-  margin-left: 1;
 }
 
 #files_scroll_container{
