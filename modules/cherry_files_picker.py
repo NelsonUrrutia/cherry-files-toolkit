@@ -49,8 +49,10 @@ class CherryFilesPicker(Vertical):
 
     def render_file_options(self, filtered_files):
         selection_list = self.query_one("#files_scroll_container", SelectionList)
+        saved_selection = list(self.selected_files)
         selection_list.clear_options()
-        selection_list.add_options((file_path, file_path, True if file_path in self.selected_files else False) for file_path in filtered_files)
+        self.selected_files = saved_selection
+        selection_list.add_options((file_path, file_path, file_path in self.selected_files) for file_path in filtered_files)
 
     def get_all_project_files(self) -> list[str]:
         root_path = Path(".")
