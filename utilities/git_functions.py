@@ -7,6 +7,10 @@ def is_git_repo() -> bool:
     else: 
         return False 
 
+def get_current_branch() -> str:
+    result = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True)
+    return result.stdout.strip()
+
 def get_branches() -> list[str]:
     "Returns an array with the repository branches"
     if not is_git_repo():

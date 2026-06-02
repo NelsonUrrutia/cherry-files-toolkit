@@ -122,3 +122,15 @@
   padding-top: 0;
   width: 100%;
 }
+
+.commit_section_item{
+    margin: 1;
+}
+
+.commit_section_item Label{
+    margin-left: 1;
+}
+
+#cherry_files_picker Button{
+  margin-left: 1;
+}
