@@ -105,8 +105,18 @@ class CherryFilesPicker(Vertical):
         success, message = cherry_pick_files(source_branch, target_branch, selected_files, commit_title, commit_description)
         if success:
             self.notify(message, severity="information")
+            self.reset_form()
         else:
-            self.notify(message, severity="information")
+            self.notify(message, severity="error")
+
+    def reset_form(self):
+        self.query_one("#target_branch").query_one("#search", Input).value = ""
+        self.query_one("#search_files_input", Input).value = ""
+        self.query_one("#commit_title", Input).value = ""
+        self.query_one("#commit_description", Input).value = ""
+        self.selected_files = []
+        self.render_file_options(self.all_files)
+        self.query_one("#selected_files_container", VerticalScroll).remove_children()
 
     async def render_selected_files_list(self):
         list_container = self.query_one("#selected_files_container", VerticalScroll)
