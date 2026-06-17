@@ -4,7 +4,7 @@ from textual.app import ComposeResult
 from textual.containers import Vertical, Horizontal, VerticalScroll
 from textual.widgets import Button, Input, Label, SelectionList
 
-from utilities.git_functions import get_branches, get_current_branch
+from utilities.git_functions import get_branches, get_current_branch, cherry_pick_files
 from widgets.filterable_option_picker import FilterableOptionPicker
 
 
@@ -102,6 +102,11 @@ class CherryFilesPicker(Vertical):
             self.notify("Please select at least one file", severity="warning")
             return
         
+        success, message = cherry_pick_files(source_branch, target_branch, selected_files, commit_title, commit_description)
+        if success:
+            self.notify(message, severity="information")
+        else:
+            self.notify(message, severity="information")
 
     async def render_selected_files_list(self):
         list_container = self.query_one("#selected_files_container", VerticalScroll)
