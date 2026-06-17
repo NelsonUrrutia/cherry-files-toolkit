@@ -44,6 +44,7 @@ class CherryFilesPicker(Vertical):
                     yield VerticalScroll(id="selected_files_container")
                 yield Button(
                     label="Cherry Pick Files",
+                    id="cta_cherry_pick_files",
                     variant="success",
                     compact=True,
                     flat=True,
@@ -82,6 +83,22 @@ class CherryFilesPicker(Vertical):
         selected_files = event.selection_list.selected
         self.selected_files = selected_files
         await self.render_selected_files_list()
+
+    @on(Button.Pressed, "#cta_cherry_pick_files")
+    def cta_cherry_pick_files_handler(self) -> None:
+        target_branch = self.query_one("#target_branch", FilterableOptionPicker).get_search_value()
+        source_branch = self.query_one("#source_branch", Input).value
+        selected_files = self.selected_files
+        commit_title = self.query_one("#commit_title", Input).value
+        commit_description = self.query_one("#commit_description", Input).value
+
+        if target_branch.strip() == "":
+            self.notify("Please select a Target Branch", severity="warning")
+            return
+        if len(selected_files) == 0:
+            self.notify("Please select at least one file", severity="warning")
+            return
+        
 
     async def render_selected_files_list(self):
         list_container = self.query_one("#selected_files_container", VerticalScroll)
