@@ -80,8 +80,11 @@ class CherryFilesPicker(Vertical):
     async def files_selected_changed(
         self, event: SelectionList.SelectedChanged[str]
     ) -> None:
-        selected_files = event.selection_list.selected
-        self.selected_files = selected_files
+        currently_selected = set(event.selection_list.selected)
+        visible = getattr(self, "_visible_files", set())
+        updated = [f for f in self.selected_files if f not in visible]
+        updated.extend(currently_selected)
+        self.selected_files = updated
         await self.render_selected_files_list()
 
     @on(Button.Pressed, "#cta_cherry_pick_files")
@@ -108,9 +111,8 @@ class CherryFilesPicker(Vertical):
 
     def render_file_options(self, filtered_files):
         selection_list = self.query_one("#files_scroll_container", SelectionList)
-        saved_selection = list(self.selected_files)
+        self._visible_files = set(filtered_files)
         selection_list.clear_options()
-        self.selected_files = saved_selection
         selection_list.add_options(
             (file_path, file_path, file_path in self.selected_files)
             for file_path in filtered_files
