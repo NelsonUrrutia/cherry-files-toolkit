@@ -6,6 +6,22 @@ from textual.widgets import Input, Label, OptionList
 
 
 class FilterableOptionPicker(Vertical):
+    DEFAULT_CSS = """
+        FilterableOptionPicker {
+            height: auto;
+        }
+
+        .filterable_option_picker_unit {
+            height: auto;
+        }
+
+        /* Bound the list so it scrolls internally instead of growing to
+           fit every branch and inflating the row it lives in. */
+        FilterableOptionPicker #options {
+            height: auto;
+            max-height: 8;
+        }
+    """
 
     def __init__(self, label:str, items: list[str] | None = None, **kwargs):
         super().__init__(**kwargs)

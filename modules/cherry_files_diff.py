@@ -159,7 +159,7 @@ class CherryFilesDiff(Vertical):
             f"-{deleted_files_counter} deleted || "
         )
         cherry_files_diff_summary_counter.update(
-            f"| Total: {added_files_counter + modified_files_counter + deleted_files_counter} files touched"
+            f"Total: {added_files_counter + modified_files_counter + deleted_files_counter} files touched"
         )
 
         # Render trees
