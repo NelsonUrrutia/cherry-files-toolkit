@@ -1,0 +1,19 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cherry-files-toolkit"
+version = "0.1.0"
+description = "TUI toolkit for cherry-picking files between git branches"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = ["textual"]
+authors = [{ name = "Nelson Urrutia", email = "nelurrutia15@gmail.com" }]
+
+[project.urls]
+Repository = "https://github.com/NelsonUrrutia/cherry-files-toolkit"
+
+[project.scripts]
+cherry-files-toolkit = "cherry_files_toolkit.main:run"
