@@ -23,8 +23,17 @@ a glance.
 
 ## Install
 
+Recommended — [pipx](https://pipx.pypa.io/) installs the tool in its own
+isolated environment and makes the command available everywhere:
+
 ```bash
-pip install cherry-files-toolkit
+pipx install cherry-files-toolkit
+```
+
+Or with plain pip:
+
+```bash
+pip install --user cherry-files-toolkit
 ```
 
 Requires Python 3.10+ and `git` on your PATH.
