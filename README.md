@@ -1,56 +1,71 @@
-# cherry-files-toolkit
+# Cherry Files Toolkit
 
-## Flow `cherry-files-picker`
+> A terminal UI (built with [Textual](https://textual.textualize.io/)) for moving
+> work between git branches at the **file** level — pick the final state of the
+> files you want and apply them to another branch as one clean commit, no
+> commit-by-commit cherry-picking.
 
-Cherry Files Picker transfers the final approved state of selected files from someone
-branch into another.
-For Cherry Files Picker, the user intent is:
+It ships two tools side by side:
 
-- “Show me the files whose current content differs from the target context.”
-- “Let me choose the final versions I want.”
-- “Apply those final versions as one clean result.”
+- **Cherry Files Picker** — select files from your current branch and commit
+  their current content onto a target branch.
+- **Cherry Files Diff** — see every file added, modified, or deleted on a
+  branch since it diverged from its base, grouped as a scannable tree.
 
-### 1. Select branches
+## The idea
 
-- The user selects a `source branch`
-  The `source branch` is the branch where the user worked: created or modified
-  files.
+This project is a new iteration of my previous
+[Cherry Files Picker](https://github.com/NelsonUrrutia/cherry-files-picker).
+The goal is the same — move the final state of selected files between branches
+as one clean commit — but this version upgrades the UI to a full TUI and adds
+a second module, **Cherry Files Diff**, for understanding branch divergence at
+a glance.
 
-- The user selects a `target branch`
-  The `target branch` is the branch where the user wants to move/merge the work.
+## Install
 
-### 2. Select files
+```bash
+pip install cherry-files-toolkit
+```
 
-- The user selects all the files that wants to move/merge to the `target branch`
+Requires Python 3.10+ and `git` on your PATH.
 
-### 3. Create commit title and description
+## Usage
 
-- The user sets a commit title and description
-- The user reviews the files to commit
+Run it from inside any git repository:
 
-### 4. Commit
+```bash
+cherry-files-toolkit
+```
 
-- The user accepts the commit and the script starts with the commit and merging process
+Press `Ctrl+Q` to quit.
 
-## Flow `cherry-files-diff`
+### Cherry Files Picker (right panel)
 
-Cherry Files Diff explains branch divergence at the file level, so someone without
-prior context can quickly understand what changed since the branch split.
+Transfers the final approved state of selected files from your working branch
+to another branch:
 
-For Cherry Files Diff, the user intent is:
+1. **Source branch** is pre-filled with your current branch.
+2. Pick a **target branch** — where the work should land.
+3. Search and select the **files** to move. Selections persist while you
+   filter.
+4. Write a **commit title and description**, review the selected files, and
+   hit **Cherry Pick Files**. The toolkit commits those files' current
+   content onto the target branch in a single commit.
 
-- “I don’t know this branch well.”
-- “Show me what was added, modified, and deleted since it diverged from base.”
-- “Group it in a way I can scan fast and recover context.”
+Use it when you know which files are done and want them on another branch
+without replaying the messy commit history that produced them.
 
-### 1. Set branches
+### Cherry Files Diff (left panel)
 
-- The user selects a `divergent branch`
-  This could be the current working branch or other.
-- The user selects the `base branch`
-  This is the base branch where the divergent branch was based on.
+Explains branch divergence at the file level, so you can recover context on a
+branch you don't know well:
 
-### 2. List of added, modified and deleted files
+1. Pick the **divergent branch** (the one with the work) and its **base
+   branch**.
+2. **Start Diff Checker** finds the point where they diverged and lists every
+   file created, modified, or deleted since — with per-category counts and a
+   directory tree for fast scanning.
 
-- The script shows all the added, modified and deleted files since
-  since the point where the divergent and based branch diverged.
+## License
+
+[MIT](LICENSE)
