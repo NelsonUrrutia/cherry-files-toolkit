@@ -3,8 +3,8 @@ from textual.binding import Binding
 from textual.widgets import Header, Footer
 from textual.containers import Horizontal
 
-from modules.cherry_files_diff import CherryFilesDiff
-from modules.cherry_files_picker import CherryFilesPicker
+from cherry_files_toolkit.modules.cherry_files_diff import CherryFilesDiff
+from cherry_files_toolkit.modules.cherry_files_picker import CherryFilesPicker
 
 
 class MyApp(App):
@@ -32,7 +32,8 @@ class MyApp(App):
     def on_mount(self) -> None:
         self.title = "Cherry Files Toolkit"
 
+def run() -> None:
+    MyApp().run()
 
 if __name__ == "__main__":
-    app = MyApp()
-    app.run()
+    run()

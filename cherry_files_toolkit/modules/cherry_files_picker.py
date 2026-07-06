@@ -4,8 +4,8 @@ from textual.app import ComposeResult
 from textual.containers import Vertical, Horizontal, VerticalScroll
 from textual.widgets import Button, Input, Label, SelectionList
 
-from utilities.git_functions import get_branches, get_current_branch, cherry_pick_files
-from widgets.filterable_option_picker import FilterableOptionPicker
+from cherry_files_toolkit.utilities.git_functions import get_branches, get_current_branch, cherry_pick_files
+from cherry_files_toolkit.widgets.filterable_option_picker import FilterableOptionPicker
 
 
 class CherryFilesPicker(Vertical):

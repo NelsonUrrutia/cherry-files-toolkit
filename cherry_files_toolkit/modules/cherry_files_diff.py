@@ -3,12 +3,12 @@ from textual import on
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Button, Label
 
-from utilities.git_functions import (
+from cherry_files_toolkit.utilities.git_functions import (
     get_branches,
     get_divergence_point,
     get_all_changed_files,
 )
-from widgets.filterable_option_picker import FilterableOptionPicker
+from cherry_files_toolkit.widgets.filterable_option_picker import FilterableOptionPicker
 
 
 class CherryFilesDiff(Vertical):
