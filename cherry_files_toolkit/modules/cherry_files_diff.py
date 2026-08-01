@@ -42,9 +42,6 @@ class CherryFilesDiff(Vertical):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="cherry_files_diff"):
-            yield Label(
-                "Cherry Files Diff", classes="header", variant="primary", expand=True
-            )
             with Vertical(classes="branches_selector"):
                 with Horizontal():
                     yield FilterableOptionPicker(
