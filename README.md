@@ -5,12 +5,12 @@
 > files you want and apply them to another branch as one clean commit, no
 > commit-by-commit cherry-picking.
 
-It ships two tools side by side:
+It ships two tools as tabs in one TUI:
 
-- **Cherry Files Picker** — select files from your current branch and commit
-  their current content onto a target branch.
 - **Cherry Files Diff** — see every file added, modified, or deleted on a
   branch since it diverged from its base, grouped as a scannable tree.
+- **Cherry Files Picker** — select files from your current branch and commit
+  their current content onto a target branch.
 
 ## The idea
 
@@ -23,17 +23,20 @@ a glance.
 
 ## Install
 
-Recommended — [pipx](https://pipx.pypa.io/) installs the tool in its own
-isolated environment and makes the command available everywhere:
+Recommended for regular use — [pipx](https://pipx.pypa.io/) installs the tool
+in its own isolated environment and makes the command available everywhere:
 
 ```bash
 pipx install cherry-files-toolkit
 ```
 
-Or with plain pip:
+If you are installing from a local checkout while developing, use an editable
+install instead:
 
 ```bash
-pip install --user cherry-files-toolkit
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
 ```
 
 Requires Python 3.10+ and `git` on your PATH.
@@ -46,9 +49,25 @@ Run it from inside any git repository:
 cherry-files-toolkit
 ```
 
-Press `Ctrl+Q` to quit.
+The app opens with **Cherry Files Diff** selected. Use the footer shortcuts to
+move between tabs:
 
-### Cherry Files Picker (right panel)
+- `Ctrl+1` — Cherry Files Diff
+- `Ctrl+2` — Cherry Files Picker
+- `Ctrl+Q` — quit
+
+### Cherry Files Diff tab
+
+Explains branch divergence at the file level, so you can recover context on a
+branch you don't know well:
+
+1. Pick the **divergent branch** (the one with the work) and its **base
+   branch**.
+2. **Start Diff Checker** finds the point where they diverged and lists every
+   file created, modified, or deleted since — with per-category counts and a
+   directory tree for fast scanning.
+
+### Cherry Files Picker tab
 
 Transfers the final approved state of selected files from your working branch
 to another branch:
@@ -63,17 +82,6 @@ to another branch:
 
 Use it when you know which files are done and want them on another branch
 without replaying the messy commit history that produced them.
-
-### Cherry Files Diff (left panel)
-
-Explains branch divergence at the file level, so you can recover context on a
-branch you don't know well:
-
-1. Pick the **divergent branch** (the one with the work) and its **base
-   branch**.
-2. **Start Diff Checker** finds the point where they diverged and lists every
-   file created, modified, or deleted since — with per-category counts and a
-   directory tree for fast scanning.
 
 ## License
 
