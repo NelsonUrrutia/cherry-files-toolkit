@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cherry-files-toolkit"
-version = "0.1.0"
+version = "0.1.1"
 description = "TUI toolkit for cherry-picking files between git branches"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -17,3 +17,14 @@ Repository = "https://github.com/NelsonUrrutia/cherry-files-toolkit"
 
 [project.scripts]
 cherry-files-toolkit = "cherry_files_toolkit.main:run"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/cherry_files_toolkit",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["cherry_files_toolkit"]
