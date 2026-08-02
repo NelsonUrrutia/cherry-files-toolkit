@@ -60,7 +60,7 @@ class CherryFilesPicker(Vertical):
 
         /* Right column: fixed-width commit form. */
         #commit_container {
-            width: 45;
+            width: 50;
             height: 1fr;
             margin-left: 1;
         }
@@ -83,9 +83,6 @@ class CherryFilesPicker(Vertical):
 
     def compose(self) -> ComposeResult:
         with Vertical(id="cherry_files_picker"):
-            yield Label(
-                "Cherry Files Picker", classes="header", variant="success", expand=True
-            )
             with Vertical(classes="branches_selector"):
                 with Horizontal(id="branch_row"):
                     with Vertical(id="source_branch_col"):
