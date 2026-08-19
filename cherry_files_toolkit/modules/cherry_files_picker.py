@@ -14,6 +14,7 @@ class CherryFilesPicker(Vertical):
            is 1fr and absorbs all the leftover height. */
         #cherry_files_picker {
             height: 1fr;
+            padding: 0 2;
         }
 
         /* Top chrome: as tall as its content. The row and its columns must
@@ -60,7 +61,7 @@ class CherryFilesPicker(Vertical):
 
         /* Right column: fixed-width commit form. */
         #commit_container {
-            width: 50;
+            width: 1fr;
             height: 1fr;
             margin-left: 1;
         }

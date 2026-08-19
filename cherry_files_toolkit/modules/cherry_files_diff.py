@@ -13,6 +13,10 @@ from cherry_files_toolkit.widgets.filterable_option_picker import FilterableOpti
 
 class CherryFilesDiff(Vertical):
     DEFAULT_CSS = """
+    #cherry_files_diff{
+        padding: 0 2;
+    }
+
     #cherry_files_diff_summary_label,
     #divergent_branch Label,
     #base_branch Label {
@@ -37,6 +41,23 @@ class CherryFilesDiff(Vertical):
         text-style: bold;
         padding-bottom: 1;
         padding-top: 1;
+    }
+
+     #files_scroll_container .cherry_files_diff_added_files,
+     #cherry_files_diff_summary_added{
+        color: green;
+     }
+
+
+    #files_scroll_container .cherry_files_diff_modified_files,
+    #cherry_files_diff_summary_modified {
+        color: orange;
+    }
+
+
+    #files_scroll_container .cherry_files_diff_deleted_files,
+    #cherry_files_diff_summary_deleted  {
+        color: red;
     }
     """
 
@@ -148,12 +169,12 @@ class CherryFilesDiff(Vertical):
         deleted_files_counter = len(deleted_files)
 
         # SUMMARY
-        cherry_files_diff_summary_added.update(f"+{added_files_counter} created || ")
+        cherry_files_diff_summary_added.update(f"+{added_files_counter} created | ")
         cherry_files_diff_summary_modified.update(
-            f"~{modified_files_counter} modified || "
+            f"~{modified_files_counter} modified | "
         )
         cherry_files_diff_summary_deleted.update(
-            f"-{deleted_files_counter} deleted || "
+            f"-{deleted_files_counter} deleted | "
         )
         cherry_files_diff_summary_counter.update(
             f"Total: {added_files_counter + modified_files_counter + deleted_files_counter} files touched"
