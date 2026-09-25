@@ -11,5 +11,3 @@
 ## Cherry Pick Files
 
 - Improve UI
-- Get data from the commit content
-- Start git steps
