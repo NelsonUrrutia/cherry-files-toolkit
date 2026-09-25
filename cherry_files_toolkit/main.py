@@ -3,6 +3,7 @@ from textual.widgets import Header, Footer, TabbedContent, TabPane
 
 from cherry_files_toolkit.modules.cherry_files_diff import CherryFilesDiff
 from cherry_files_toolkit.modules.cherry_files_picker import CherryFilesPicker
+from cherry_files_toolkit.views.welcome import WelcomeScreen
 
 
 class MyApp(App):
@@ -24,6 +25,7 @@ class MyApp(App):
 
     def on_mount(self) -> None:
         self.title = "Cherry Files Toolkit"
+        self.push_screen(WelcomeScreen())
 
     def action_show_tab(self, tab: str) -> None:
         self.get_child_by_type(TabbedContent).active = tab
