@@ -16,10 +16,10 @@ It ships two tools as tabs in one TUI:
 
 I often encountered a scenario where a file or several files were modified across
 multiple commits. And by the time they where ready to push to production, I had
-to manually select all the commits related to those files, to cherry pick them 
+to manually select all the commits related to those files, to cherry pick them
 and merge them into production.
 
-Then, I realized what I really wanted was the final result, the approved code 
+Then, I realized what I really wanted was the final result, the approved code
 version of the files, not the detailed history of commits.
 
 This project is a new iteration of my previous

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "cherry-files-toolkit"
-version = "0.1.2"
+version = "1.0.3"
 description = "TUI toolkit for cherry-picking files between git branches"
 readme = "README.md"
 license = { file = "LICENSE" }
