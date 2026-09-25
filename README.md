@@ -1,4 +1,4 @@
-# Cherry Files Toolkit
+![Cherry Files Toolkit banner](https://github.com/NelsonUrrutia/cherry-files-toolkit/blob/main/assets/banner.svg)
 
 > A terminal UI (built with [Textual](https://textual.textualize.io/)) for moving
 > work between git branches at the **file** level — pick the final state of the
