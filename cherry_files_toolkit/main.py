@@ -1,16 +1,16 @@
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.widgets import Header, Footer, TabbedContent, TabPane
 
-from cherry_files_toolkit.modules.cherry_files_diff import CherryFilesDiff
-from cherry_files_toolkit.modules.cherry_files_picker import CherryFilesPicker
+from cherry_files_toolkit.views.cherry_files_diff import CherryFilesDiff
+from cherry_files_toolkit.views.cherry_files_picker import CherryFilesPicker
 from cherry_files_toolkit.views.welcome import WelcomeScreen
 
 
 class MyApp(App):
     BINDINGS = [
-        ("ctrl+1", "show_tab('cherry_files_diff')", "Cherry Files Diff"),
-        ("ctrl+2", "show_tab('cherry_files_picker')", "Cherry Files Picker"),
-        ("ctrl+q", "quit", "[Ctrl+q]Quit the app"),
+        Binding("ctrl+1", "show_tab('cherry_files_diff')", "Cherry Files Diff", show=False),
+        Binding("ctrl+2", "show_tab('cherry_files_picker')", "Cherry Files Picker", show=False),
     ]
 
     def compose(self) -> ComposeResult:

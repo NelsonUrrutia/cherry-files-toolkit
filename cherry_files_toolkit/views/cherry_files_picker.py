@@ -1,10 +1,15 @@
 from pathlib import Path
+
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import Vertical, Horizontal, VerticalScroll
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Button, Input, Label, SelectionList
 
-from cherry_files_toolkit.utilities.git_functions import get_branches, get_current_branch, cherry_pick_files
+from cherry_files_toolkit.utilities.git_functions import (
+    cherry_pick_files,
+    get_branches,
+    get_current_branch,
+)
 from cherry_files_toolkit.widgets.filterable_option_picker import FilterableOptionPicker
 
 

@@ -17,54 +17,65 @@ class CherryFilesDiff(Vertical):
         padding: 0 2;
     }
 
-    #cherry_files_diff_summary_label,
-    #divergent_branch Label,
-    #base_branch Label {
-        text-style: bold;
-        padding-bottom: 1;
-        padding-top: 1;
+    /* Top chrome sizes to its content so the summary gets the rest. */
+    .branches_selector,
+    #branch_row {
+        height: auto;
     }
 
+    #base_branch {
+        margin-left: 1;
+    }
+
+    /* Title and counts share one row, right above the columns. */
     #cherry_files_diff_summary_header {
         height: 1;
-        margin-bottom: 0;
     }
 
-    #files_scroll_container {
-        margin-top: 1;
-        padding-bottom: 1;
-    }
-
-    #files_scroll_container .cherry_files_diff_added_files,
-    #files_scroll_container .cherry_files_diff_modified_files,
-    #files_scroll_container .cherry_files_diff_deleted_files {
+    #cherry_files_diff_summary_label {
         text-style: bold;
-        padding-bottom: 1;
-        padding-top: 1;
+        margin-right: 2;
     }
 
-     #files_scroll_container .cherry_files_diff_added_files,
-     #cherry_files_diff_summary_added{
-        color: green;
-     }
-
-
-    #files_scroll_container .cherry_files_diff_modified_files,
-    #cherry_files_diff_summary_modified {
-        color: orange;
+    /* One scrollable tree per change type, side by side. */
+    #files_containers {
+        height: 1fr;
     }
 
+    .files_scroll_container {
+        width: 1fr;
+        height: 1fr;
+        border: round $primary;
+        border-title-align: center;
+        border-title-style: bold;
+    }
 
-    #files_scroll_container .cherry_files_diff_deleted_files,
-    #cherry_files_diff_summary_deleted  {
-        color: red;
+    .files_scroll_container:focus {
+        border: round $primary-lighten-2;
+    }
+
+    .no_files {
+        color: $text-muted;
+        text-style: italic;
+    }
+
+    #added_files_container {
+        border-title-color: green;
+    }
+
+    #modified_files_container {
+        border-title-color: orange;
+    }
+
+    #deleted_files_container {
+        border-title-color: red;
     }
     """
 
     def compose(self) -> ComposeResult:
         with Vertical(id="cherry_files_diff"):
             with Vertical(classes="branches_selector"):
-                with Horizontal():
+                with Horizontal(id="branch_row"):
                     yield FilterableOptionPicker(
                         label="[1] Divergent Branch",
                         id="divergent_branch",
@@ -80,22 +91,20 @@ class CherryFilesDiff(Vertical):
                     flat=True,
                 )
             with Vertical(id="cherry_files_diff_summary"):
-                yield Label("[3] Summary", id="cherry_files_diff_summary_label")
                 with Horizontal(id="cherry_files_diff_summary_header"):
-                    yield Label(
-                        id="cherry_files_diff_summary_added",
-                        classes="cherry_files_diff_added_files",
-                    )
-                    yield Label(
-                        id="cherry_files_diff_summary_modified",
-                        classes="cherry_files_diff_modified_files",
-                    )
-                    yield Label(
-                        id="cherry_files_diff_summary_deleted",
-                        classes="cherry_files_diff_deleted_files",
-                    )
+                    yield Label("[3] Summary", id="cherry_files_diff_summary_label")
                     yield Label(id="cherry_files_diff_summary_counter")
-                yield VerticalScroll(id="files_scroll_container")
+                with Horizontal(id="files_containers"):
+                    for container_id, title in (
+                        ("added_files_container", "Created"),
+                        ("modified_files_container", "Modified"),
+                        ("deleted_files_container", "Deleted"),
+                    ):
+                        files_container = VerticalScroll(
+                            id=container_id, classes="files_scroll_container"
+                        )
+                        files_container.border_title = title
+                        yield files_container
 
     def on_mount(self) -> None:
         branches = get_branches()
@@ -150,16 +159,6 @@ class CherryFilesDiff(Vertical):
         await self.render_files(added_files, modified_files, deleted_files)
 
     async def render_files(self, added_files, modified_files, deleted_files) -> None:
-        files_container = self.query_one("#files_scroll_container", VerticalScroll)
-        cherry_files_diff_summary_added = self.query_one(
-            "#cherry_files_diff_summary_added", Label
-        )
-        cherry_files_diff_summary_modified = self.query_one(
-            "#cherry_files_diff_summary_modified", Label
-        )
-        cherry_files_diff_summary_deleted = self.query_one(
-            "#cherry_files_diff_summary_deleted", Label
-        )
         cherry_files_diff_summary_counter = self.query_one(
             "#cherry_files_diff_summary_counter", Label
         )
@@ -169,42 +168,37 @@ class CherryFilesDiff(Vertical):
         deleted_files_counter = len(deleted_files)
 
         # SUMMARY
-        cherry_files_diff_summary_added.update(f"+{added_files_counter} created | ")
-        cherry_files_diff_summary_modified.update(
-            f"~{modified_files_counter} modified | "
-        )
-        cherry_files_diff_summary_deleted.update(
-            f"-{deleted_files_counter} deleted | "
-        )
         cherry_files_diff_summary_counter.update(
             f"Total: {added_files_counter + modified_files_counter + deleted_files_counter} files touched"
         )
 
-        # Render trees
-        await files_container.remove_children()
+        # Render trees, with each count in its column's border title
         await self.render_tree_files(
-            "CREATED FILES", "cherry_files_diff_added_files", added_files
+            "#added_files_container", f"+{added_files_counter} Created", added_files
         )
         await self.render_tree_files(
-            "MODIFIED FILES", "cherry_files_diff_modified_files", modified_files
+            "#modified_files_container",
+            f"~{modified_files_counter} Modified",
+            modified_files,
         )
         await self.render_tree_files(
-            "DELETED FILES", "cherry_files_diff_deleted_files", deleted_files
+            "#deleted_files_container", f"-{deleted_files_counter} Deleted", deleted_files
         )
 
     async def render_tree_files(
-        self, label: str, label_class: str, files: list[str]
+        self, container_id: str, title: str, files: list[str]
     ) -> None:
-        files_container = self.query_one("#files_scroll_container", VerticalScroll)
-        await files_container.mount(Label(label, classes=label_class))
+        files_container = self.query_one(container_id, VerticalScroll)
+        files_container.border_title = title
+        await files_container.remove_children()
         if len(files) == 0:
+            await files_container.mount(Label("No files", classes="no_files"))
             return
         await files_container.mount(Label("📂 root", classes="parent_directory"))
         tree = self.build_tree(files)
-        await self.render_tree(tree)
+        await self.render_tree(files_container, tree)
 
-    async def render_tree(self, tree, prefix=""):
-        files_container = self.query_one("#files_scroll_container", VerticalScroll)
+    async def render_tree(self, files_container: VerticalScroll, tree, prefix=""):
         entries = list(tree.items())
         for i, (name, subtree) in enumerate(entries):
             is_last = i == len(entries) - 1
@@ -223,7 +217,7 @@ class CherryFilesDiff(Vertical):
             self.log(prefix + connector + name)
             if subtree:
                 extension = "    " if is_last else "│   "
-                await self.render_tree(subtree, prefix + extension)
+                await self.render_tree(files_container, subtree, prefix + extension)
 
     def parsed_files(self, changed_files):
         added_files = []

@@ -31,7 +31,7 @@ class FilterableOptionPicker(Vertical):
            fit every branch and inflating the row it lives in. */
         FilterableOptionPicker #options {
             height: auto;
-            max-height: 8;
+            max-height: 12;
             border: round $primary;
             padding: 0;
         }
