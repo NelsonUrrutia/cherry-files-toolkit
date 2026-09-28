@@ -1,5 +1,7 @@
 ![Cherry Files Toolkit banner](https://github.com/NelsonUrrutia/cherry-files-toolkit/blob/main/assets/banner.svg)
 
+![Cherry Files Toolkit Screens: welcome, diff, picker](https://github.com/NelsonUrrutia/cherry-files-toolkit/blob/main/assets/cherry-files-toolkit-banner.png)
+
 > A terminal UI (built with [Textual](https://textual.textualize.io/)) for moving
 > work between git branches at the **file** level — pick the final state of the
 > files you want and apply them to another branch as one clean commit, no
