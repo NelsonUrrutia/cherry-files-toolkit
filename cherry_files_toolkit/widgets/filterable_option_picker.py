@@ -75,6 +75,9 @@ class FilterableOptionPicker(Vertical):
     def get_search_value(self) -> str:
         return self.query_one("#search", Input).value
 
+    def set_search_value(self, value: str) -> None:
+        self.query_one("#search", Input).value = value
+
     @on(Input.Changed, "#search")
     def filter(self, event:Input.Changed) -> None:
         text = event.value.strip().lower()

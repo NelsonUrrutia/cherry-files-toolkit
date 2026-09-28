@@ -32,6 +32,11 @@ def get_all_changed_files(divergent:str, commit_id:str) -> list[str]:
     return lines
 
 
+def get_branch_files(branch: str) -> list[str]:
+    "Returns every file committed on the branch, the ones git can check out from it"
+    result = subprocess.run(["git", "ls-tree", "-r", "--name-only", branch], capture_output=True, text=True)
+    return [line for line in result.stdout.splitlines() if line.strip()]
+
 def switch_branch(branch: str) -> subprocess.CompletedProcess:
     return subprocess.run(["git", "checkout", branch], capture_output=True, text=True)
 
@@ -48,20 +53,22 @@ def commit(title: str, description:str = "") -> subprocess.CompletedProcess:
     return subprocess.run(cmd, capture_output=True, text=True)
 
 def cherry_pick_files(source_branch:str, target_branch:str, files:list[str], commit_title:str, commit_description: str = "") -> tuple[bool, str]:
+    # The source can be any branch, so come back to where the user started.
+    original_branch = get_current_branch()
     result = switch_branch(target_branch)
     if result.returncode != 0:
         return False, f"Failed to switch to {target_branch}: {result.stderr.strip()}"
     result = checkout_files_from_branch(source_branch, files)
     if result.returncode != 0:
-        switch_branch(source_branch)
+        switch_branch(original_branch)
         return False, f"Failed to checkout files from {source_branch}: {result.stderr.strip()}"
     result = stage_files(files)
     if result.returncode != 0:
-        switch_branch(source_branch)
+        switch_branch(original_branch)
         return False, f"Failed to stage files: {result.stderr.strip()}"
     result = commit(commit_title, commit_description)
     if result.returncode != 0:
-        switch_branch(source_branch)
+        switch_branch(original_branch)
         return False, f"Failed to commit:{result.stderr.strip()}"
-    switch_branch(source_branch)
+    switch_branch(original_branch)
     return True, "Cherry pick completed successfully"
