@@ -59,13 +59,6 @@ Run it from inside any git repository:
 cherry-files-toolkit
 ```
 
-The app opens with **Cherry Files Diff** selected. Use the footer shortcuts to
-move between tabs:
-
-- `Ctrl+1` — Cherry Files Diff
-- `Ctrl+2` — Cherry Files Picker
-- `Ctrl+Q` — quit
-
 ### Cherry Files Diff tab
 
 Explains branch divergence at the file level, so you can recover context on a
