@@ -14,7 +14,6 @@ class CherryFilesPicker(Vertical):
            is 1fr and absorbs all the leftover height. */
         #cherry_files_picker {
             height: 1fr;
-            padding: 0 2;
         }
 
         /* Top chrome: as tall as its content. The row and its columns must
@@ -37,10 +36,16 @@ class CherryFilesPicker(Vertical):
             width: 1fr;
         }
 
-        /* Numbered section headings are bold. */
-        .section_label,
-        #target_branch Label {
-            text-style: bold;
+        /* Inputs carry their label as a title centred on the top border. */
+        .bordered_input {
+            border: round $primary;
+            border-title-align: center;
+            border-title-color: $primary;
+            border-title-style: bold;
+        }
+
+        .bordered_input:focus {
+            border: round $primary-lighten-2;
         }
 
         /* The flexible body: two columns sharing all remaining height. */
@@ -57,13 +62,18 @@ class CherryFilesPicker(Vertical):
 
         #files_scroll_container {
             height: 1fr;
+            border: round $primary;
+            padding: 0;
+        }
+
+        #files_scroll_container:focus {
+            border: round $primary-lighten-2;
         }
 
         /* Right column: fixed-width commit form. */
         #commit_container {
             width: 1fr;
             height: 1fr;
-            margin-left: 1;
         }
 
         /* Form fields size to content; the selected-files list soaks up
@@ -78,7 +88,10 @@ class CherryFilesPicker(Vertical):
 
         #selected_files_container {
             height: 1fr;
-            border: solid white;
+            border: solid $primary;
+            border-title-align: center;
+            border-title-color: $primary;
+            border-title-style: bold;
         }
     """
 
@@ -87,8 +100,11 @@ class CherryFilesPicker(Vertical):
             with Vertical(classes="branches_selector"):
                 with Horizontal(id="branch_row"):
                     with Vertical(id="source_branch_col"):
-                        yield Label("[1] Source Branch", classes="section_label")
-                        yield Input(id="source_branch", disabled=True)
+                        source_branch = Input(
+                            id="source_branch", classes="bordered_input", disabled=True
+                        )
+                        source_branch.border_title = "[1] Source Branch"
+                        yield source_branch
                     yield FilterableOptionPicker(
                         label="[2] Target Branch",
                         id="target_branch",
@@ -96,24 +112,31 @@ class CherryFilesPicker(Vertical):
                     )
             with Horizontal(id="body"):
                 with Vertical(id="files_panel", classes="container"):
-                    yield Label("[3] Files", classes="section_label")
-                    yield Input(
-                        placeholder="Type to search files", id="search_files_input"
+                    search_files = Input(
+                        placeholder="Type to search files",
+                        id="search_files_input",
+                        classes="bordered_input",
                     )
+                    search_files.border_title = "[3] Files"
+                    yield search_files
                     yield SelectionList(id="files_scroll_container")
                 with Vertical(id="commit_container", classes="container"):
-                    yield Label("[4] Commit", classes="section_label")
                     with Vertical(classes="commit_section_item"):
-                        yield Label("Commit title")
-                        yield Input(id="commit_title")
+                        commit_title = Input(id="commit_title", classes="bordered_input")
+                        commit_title.border_title = "[4] Commit title"
+                        yield commit_title
                     with Vertical(classes="commit_section_item"):
-                        yield Label("Commit description")
-                        yield Input(id="commit_description")
+                        commit_description = Input(
+                            id="commit_description", classes="bordered_input"
+                        )
+                        commit_description.border_title = "[5] Commit description"
+                        yield commit_description
                     with Vertical(
                         id="selected_files_item", classes="commit_section_item"
                     ):
-                        yield Label("Selected files")
-                        yield VerticalScroll(id="selected_files_container")
+                        selected_files = VerticalScroll(id="selected_files_container")
+                        selected_files.border_title = "Selected files"
+                        yield selected_files
                     yield Button(
                         label="Cherry Pick Files",
                         id="cta_cherry_pick_files",

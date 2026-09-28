@@ -2,7 +2,7 @@ from textual import on
 from textual.app import ComposeResult
 from textual.containers import Vertical
 from textual.suggester import SuggestFromList
-from textual.widgets import Input, Label, OptionList
+from textual.widgets import Input, OptionList
 
 
 class FilterableOptionPicker(Vertical):
@@ -15,11 +15,29 @@ class FilterableOptionPicker(Vertical):
             height: auto;
         }
 
+        /* The label sits as a title centred on the search input's border. */
+        FilterableOptionPicker #search {
+            border: round $primary;
+            border-title-align: center;
+            border-title-color: $primary;
+            border-title-style: bold;
+        }
+
+        FilterableOptionPicker #search:focus {
+            border: round $primary-lighten-2;
+        }
+
         /* Bound the list so it scrolls internally instead of growing to
            fit every branch and inflating the row it lives in. */
         FilterableOptionPicker #options {
             height: auto;
             max-height: 8;
+            border: round $primary;
+            padding: 0;
+        }
+
+        FilterableOptionPicker #options:focus {
+            border: round $primary-lighten-2;
         }
     """
 
@@ -31,8 +49,9 @@ class FilterableOptionPicker(Vertical):
 
     def compose(self) -> ComposeResult:
         with Vertical(classes="filterable_option_picker_unit"):
-            yield Label(self.label)
-            yield Input(suggester=SuggestFromList(self.items, case_sensitive=False), id="search")
+            search = Input(suggester=SuggestFromList(self.items, case_sensitive=False), id="search")
+            search.border_title = self.label
+            yield search
             yield OptionList(id="options")
 
     def on_mount(self, ) -> None:
