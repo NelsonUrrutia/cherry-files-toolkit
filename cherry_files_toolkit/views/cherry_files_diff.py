@@ -1,15 +1,44 @@
+from rich.text import Text
+from textual import events, on
 from textual.app import ComposeResult
-from textual import on
 from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.message import Message
 from textual.widgets import Button, Label
 
 from cherry_files_toolkit.utilities.clipboard import copy_with_system_clipboard
 from cherry_files_toolkit.utilities.git_functions import (
+    get_all_changed_files,
     get_branches,
     get_divergence_point,
-    get_all_changed_files,
+    get_file_diff,
 )
+from cherry_files_toolkit.views.file_diff_modal import FileDiffModal
 from cherry_files_toolkit.widgets.filterable_option_picker import FilterableOptionPicker
+
+
+class FileLabel(Label):
+    "A file row in a tree; clicking it asks to show that file's diff"
+
+    class Selected(Message):
+        def __init__(self, path: str) -> None:
+            super().__init__()
+            self.path = path
+
+    # Styles just the file name, so the tree connectors don't get underlined.
+    COMPONENT_CLASSES = {"file-label--name"}
+
+    def __init__(self, connector: str, name: str, path: str, **kwargs):
+        super().__init__(connector + name, markup=False, **kwargs)
+        self.connector = connector
+        self.file_name = name
+        self.path = path
+
+    def render(self) -> Text:
+        name_style = self.get_component_rich_style("file-label--name")
+        return Text.assemble(self.connector, (self.file_name, name_style))
+
+    def on_click(self, event: events.Click) -> None:
+        self.post_message(self.Selected(self.path))
 
 
 class CherryFilesDiff(Vertical):
@@ -86,6 +115,29 @@ class CherryFilesDiff(Vertical):
         border-title-color: red;
     }
 
+    /* File rows open a diff preview, so make them read like links. */
+    FileLabel {
+        pointer: pointer;
+    }
+
+    FileLabel > .file-label--name {
+        text-style: bold;
+    }
+
+    FileLabel:hover {
+        background: $boost;
+    }
+
+    FileLabel:hover > .file-label--name {
+        color: $accent;
+        text-style: bold underline;
+    }
+
+    .files_scroll_container {
+        border-subtitle-color: $text-muted;
+        border-subtitle-style: italic;
+    }
+
     .copy_tree_button {
         width: auto;
         padding: 0 1;
@@ -136,6 +188,8 @@ class CherryFilesDiff(Vertical):
     def on_mount(self) -> None:
         # Plain-text tree per container, kept so the copy buttons can grab it.
         self.tree_texts: dict[str, str] = {}
+        # (divergent branch, divergence commit) of the last diff, for file diffs.
+        self.diff_range: tuple[str, str] | None = None
         branches = get_branches()
         if len(branches) == 0:
             self.notify(
@@ -194,18 +248,29 @@ class CherryFilesDiff(Vertical):
 
     @on(Button.Pressed, "#reset_diff_checker")
     async def reset_diff_checker_handler(self) -> None:
+        self.diff_range = None
         for picker in self.query(FilterableOptionPicker):
             picker.reset()
         self.query_one("#cherry_files_diff_summary_counter", Label).update("")
         for container_id, title in self.FILE_COLUMNS:
             files_container = self.query_one(f"#{container_id}", VerticalScroll)
             files_container.border_title = title
+            files_container.border_subtitle = ""
             await files_container.remove_children()
             self.tree_texts[container_id] = ""
             self.query_one(f"#copy_{container_id}", Button).disabled = True
 
+    @on(FileLabel.Selected)
+    def show_file_diff_handler(self, event: FileLabel.Selected) -> None:
+        if self.diff_range is None:
+            return
+        divergent, commit_id = self.diff_range
+        diff_text = get_file_diff(divergent=divergent, commit_id=commit_id, path=event.path)
+        self.app.push_screen(FileDiffModal(event.path, diff_text))
+
     async def files_diff(self, base: str, divergent: str) -> None:
         commit_id = get_divergence_point(base=base, branch=divergent)
+        self.diff_range = (divergent, commit_id)
         changed_files = get_all_changed_files(divergent=divergent, commit_id=commit_id)
         added_files, modified_files, deleted_files = self.parsed_files(changed_files)
         await self.render_files(added_files, modified_files, deleted_files)
@@ -247,6 +312,7 @@ class CherryFilesDiff(Vertical):
         if len(files) == 0:
             self.tree_texts[container_id[1:]] = ""
             copy_button.disabled = True
+            files_container.border_subtitle = ""
             await files_container.mount(Label("No files", classes="no_files"))
             return
         await files_container.mount(Label("📂 root", classes="parent_directory"))
@@ -255,9 +321,15 @@ class CherryFilesDiff(Vertical):
         await self.render_tree(files_container, tree, lines)
         self.tree_texts[container_id[1:]] = "\n".join(lines)
         copy_button.disabled = False
+        files_container.border_subtitle = "click a file to preview"
 
     async def render_tree(
-        self, files_container: VerticalScroll, tree, lines: list[str], prefix=""
+        self,
+        files_container: VerticalScroll,
+        tree,
+        lines: list[str],
+        prefix="",
+        path_prefix="",
     ):
         entries = list(tree.items())
         for i, (name, subtree) in enumerate(entries):
@@ -267,14 +339,20 @@ class CherryFilesDiff(Vertical):
                 connector += "📂 "
             classes = "parent_directory" if subtree else ""
             lines.append(prefix + connector + name)
-            await files_container.mount(
-                Label(prefix + connector + name, classes=classes)
-            )
+            if subtree:
+                row = Label(prefix + connector + name, classes=classes)
+            else:
+                row = FileLabel(prefix + connector, name, path=path_prefix + name)
+            await files_container.mount(row)
             self.log(prefix + connector + name)
             if subtree:
                 extension = "    " if is_last else "│   "
                 await self.render_tree(
-                    files_container, subtree, lines, prefix + extension
+                    files_container,
+                    subtree,
+                    lines,
+                    prefix + extension,
+                    path_prefix + name + "/",
                 )
 
     def parsed_files(self, changed_files):

@@ -31,6 +31,11 @@ def get_all_changed_files(divergent:str, commit_id:str) -> list[str]:
     lines = [line for line in result.stdout.splitlines() if line.strip()]
     return lines
 
+def get_file_diff(divergent:str, commit_id:str, path:str) -> str:
+    "Returns the git diff of one file, over the same range as get_all_changed_files"
+    result = subprocess.run(["git", "diff", f"{commit_id}..{divergent}", "--", path], capture_output=True, text=True)
+    return result.stdout
+
 
 def get_branch_files(branch: str) -> list[str]:
     "Returns every file committed on the branch, the ones git can check out from it"

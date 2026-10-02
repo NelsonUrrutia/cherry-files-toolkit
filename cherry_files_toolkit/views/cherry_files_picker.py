@@ -5,8 +5,8 @@ from textual.widgets import Button, Input, Label, SelectionList
 
 from cherry_files_toolkit.utilities.git_functions import (
     cherry_pick_files,
-    get_branches,
     get_branch_files,
+    get_branches,
     get_current_branch,
 )
 from cherry_files_toolkit.widgets.filterable_option_picker import FilterableOptionPicker

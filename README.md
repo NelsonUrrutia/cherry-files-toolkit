@@ -1,6 +1,6 @@
-![Cherry Files Toolkit banner](https://github.com/NelsonUrrutia/cherry-files-toolkit/blob/main/assets/banner.svg)
+![Cherry Files Toolkit banner](https://raw.githubusercontent.com/NelsonUrrutia/cherry-files-toolkit/main/assets/banner.svg)
 
-![Cherry Files Toolkit Screens: welcome, diff, picker](https://github.com/NelsonUrrutia/cherry-files-toolkit/blob/main/assets/cherry-files-toolkit-banner.png)
+![Cherry Files Toolkit Screens: welcome, diff, picker](https://raw.githubusercontent.com/NelsonUrrutia/cherry-files-toolkit/main/assets/cherry-files-toolkit-banner.png)
 
 > A terminal UI (built with [Textual](https://textual.textualize.io/)) for moving
 > work between git branches at the **file** level — pick the final state of the
@@ -10,7 +10,8 @@
 It ships two tools as tabs in one TUI:
 
 - **Cherry Files Diff** — see every file added, modified, or deleted on a
-  branch since it diverged from its base, grouped as a scannable tree.
+  branch since it diverged from its base, grouped as a scannable tree. Click
+  any file to preview its diff.
 - **Cherry Files Picker** — select files from your current branch and commit
   their current content onto a target branch.
 
@@ -69,6 +70,13 @@ branch you don't know well:
 2. **Start Diff Checker** finds the point where they diverged and lists every
    file created, modified, or deleted since — with per-category counts and a
    directory tree for fast scanning.
+3. **Click a file name** to preview its diff in a pop-up — the same output as
+   `git diff` for that file between the divergence point and the divergent
+   branch, with added lines in green and removed lines in red. File names are
+   highlighted like links on hover. Press `Esc` or **Close** to go back.
+4. **Copy \<Type\> Tree** under each column copies that tree as plain text,
+   ready to paste into a PR description or a message.
+5. **Reset** clears the trees and both branch selectors to start over.
 
 ### Cherry Files Picker tab
 
