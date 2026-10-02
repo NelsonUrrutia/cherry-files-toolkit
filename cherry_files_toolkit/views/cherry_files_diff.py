@@ -3,6 +3,7 @@ from textual import on
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Button, Label
 
+from cherry_files_toolkit.utilities.clipboard import copy_with_system_clipboard
 from cherry_files_toolkit.utilities.git_functions import (
     get_branches,
     get_divergence_point,
@@ -12,6 +13,13 @@ from cherry_files_toolkit.widgets.filterable_option_picker import FilterableOpti
 
 
 class CherryFilesDiff(Vertical):
+    # (container id, column title) for each change type, left to right.
+    FILE_COLUMNS = (
+        ("added_files_container", "Created"),
+        ("modified_files_container", "Modified"),
+        ("deleted_files_container", "Deleted"),
+    )
+
     DEFAULT_CSS = """
     #cherry_files_diff{
         padding: 0 2;
@@ -19,11 +27,13 @@ class CherryFilesDiff(Vertical):
 
     /* Top chrome sizes to its content so the summary gets the rest. */
     .branches_selector,
-    #branch_row {
+    #branch_row,
+    #diff_actions_row {
         height: auto;
     }
 
-    #base_branch {
+    #base_branch,
+    #reset_diff_checker {
         margin-left: 1;
     }
 
@@ -42,8 +52,13 @@ class CherryFilesDiff(Vertical):
         height: 1fr;
     }
 
-    .files_scroll_container {
+    /* Each column stacks its tree above its copy button. */
+    .files_column {
         width: 1fr;
+        height: 1fr;
+    }
+
+    .files_scroll_container {
         height: 1fr;
         border: round $primary;
         border-title-align: center;
@@ -70,6 +85,11 @@ class CherryFilesDiff(Vertical):
     #deleted_files_container {
         border-title-color: red;
     }
+
+    .copy_tree_button {
+        width: auto;
+        padding: 0 1;
+    }
     """
 
     def compose(self) -> ComposeResult:
@@ -84,29 +104,38 @@ class CherryFilesDiff(Vertical):
                     yield FilterableOptionPicker(
                         label="[2] Base Branch", id="base_branch", classes="container"
                     )
-                yield Button(
-                    "Start Diff Checker",
-                    id="start_diff_checker",
-                    variant="primary",
-                    flat=True,
-                )
+                with Horizontal(id="diff_actions_row"):
+                    yield Button(
+                        "Start Diff Checker",
+                        id="start_diff_checker",
+                        variant="primary",
+                        flat=True,
+                    )
+                    yield Button("RESET", id="reset_diff_checker", flat=True)
             with Vertical(id="cherry_files_diff_summary"):
                 with Horizontal(id="cherry_files_diff_summary_header"):
                     yield Label("[3] Summary", id="cherry_files_diff_summary_label")
                     yield Label(id="cherry_files_diff_summary_counter")
                 with Horizontal(id="files_containers"):
-                    for container_id, title in (
-                        ("added_files_container", "Created"),
-                        ("modified_files_container", "Modified"),
-                        ("deleted_files_container", "Deleted"),
-                    ):
-                        files_container = VerticalScroll(
-                            id=container_id, classes="files_scroll_container"
-                        )
-                        files_container.border_title = title
-                        yield files_container
+                    for container_id, title in self.FILE_COLUMNS:
+                        with Vertical(classes="files_column"):
+                            files_container = VerticalScroll(
+                                id=container_id, classes="files_scroll_container"
+                            )
+                            files_container.border_title = title
+                            yield files_container
+                            yield Button(
+                                f"COPY {title.upper()} TREE",
+                                id=f"copy_{container_id}",
+                                name=container_id,
+                                classes="copy_tree_button",
+                                flat=True,
+                                disabled=True,
+                            )
 
     def on_mount(self) -> None:
+        # Plain-text tree per container, kept so the copy buttons can grab it.
+        self.tree_texts: dict[str, str] = {}
         branches = get_branches()
         if len(branches) == 0:
             self.notify(
@@ -152,6 +181,29 @@ class CherryFilesDiff(Vertical):
 
         await self.files_diff(base_branch, divergent_branch)
 
+    @on(Button.Pressed, ".copy_tree_button")
+    def copy_tree_handler(self, event: Button.Pressed) -> None:
+        tree_text = self.tree_texts.get(event.button.name or "", "")
+        if tree_text == "":
+            return
+        # OSC 52 isn't supported by every terminal (e.g. macOS Terminal.app),
+        # so prefer the OS clipboard and fall back to Textual's.
+        if not copy_with_system_clipboard(tree_text):
+            self.app.copy_to_clipboard(tree_text)
+        self.notify("Tree copied to clipboard", title="Cherry Diff Files")
+
+    @on(Button.Pressed, "#reset_diff_checker")
+    async def reset_diff_checker_handler(self) -> None:
+        for picker in self.query(FilterableOptionPicker):
+            picker.reset()
+        self.query_one("#cherry_files_diff_summary_counter", Label).update("")
+        for container_id, title in self.FILE_COLUMNS:
+            files_container = self.query_one(f"#{container_id}", VerticalScroll)
+            files_container.border_title = title
+            await files_container.remove_children()
+            self.tree_texts[container_id] = ""
+            self.query_one(f"#copy_{container_id}", Button).disabled = True
+
     async def files_diff(self, base: str, divergent: str) -> None:
         commit_id = get_divergence_point(base=base, branch=divergent)
         changed_files = get_all_changed_files(divergent=divergent, commit_id=commit_id)
@@ -190,34 +242,40 @@ class CherryFilesDiff(Vertical):
     ) -> None:
         files_container = self.query_one(container_id, VerticalScroll)
         files_container.border_title = title
+        copy_button = self.query_one(f"#copy_{container_id[1:]}", Button)
         await files_container.remove_children()
         if len(files) == 0:
+            self.tree_texts[container_id[1:]] = ""
+            copy_button.disabled = True
             await files_container.mount(Label("No files", classes="no_files"))
             return
         await files_container.mount(Label("📂 root", classes="parent_directory"))
         tree = self.build_tree(files)
-        await self.render_tree(files_container, tree)
+        lines = ["📂 root"]
+        await self.render_tree(files_container, tree, lines)
+        self.tree_texts[container_id[1:]] = "\n".join(lines)
+        copy_button.disabled = False
 
-    async def render_tree(self, files_container: VerticalScroll, tree, prefix=""):
+    async def render_tree(
+        self, files_container: VerticalScroll, tree, lines: list[str], prefix=""
+    ):
         entries = list(tree.items())
         for i, (name, subtree) in enumerate(entries):
             is_last = i == len(entries) - 1
-            connector = ""
-            if is_last and not subtree:
-                connector = "└── "
-            elif subtree:
-                connector = "├── 📂 "
-            else:
-                connector = "├── "
-            #            connector = if is_last and not subtree elif subtree "-" else "├── "
+            connector = "└── " if is_last else "├── "
+            if subtree:
+                connector += "📂 "
             classes = "parent_directory" if subtree else ""
+            lines.append(prefix + connector + name)
             await files_container.mount(
                 Label(prefix + connector + name, classes=classes)
             )
             self.log(prefix + connector + name)
             if subtree:
                 extension = "    " if is_last else "│   "
-                await self.render_tree(files_container, subtree, prefix + extension)
+                await self.render_tree(
+                    files_container, subtree, lines, prefix + extension
+                )
 
     def parsed_files(self, changed_files):
         added_files = []

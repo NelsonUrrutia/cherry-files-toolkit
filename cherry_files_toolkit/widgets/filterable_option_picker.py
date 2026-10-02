@@ -78,6 +78,11 @@ class FilterableOptionPicker(Vertical):
     def set_search_value(self, value: str) -> None:
         self.query_one("#search", Input).value = value
 
+    def reset(self) -> None:
+        "Clears the search and shows the full, unfiltered list again"
+        self.set_search_value("")
+        self.sync_option_list()
+
     @on(Input.Changed, "#search")
     def filter(self, event:Input.Changed) -> None:
         text = event.value.strip().lower()
