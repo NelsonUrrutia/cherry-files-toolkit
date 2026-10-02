@@ -1,6 +1,6 @@
 ![Cherry Files Toolkit banner](https://raw.githubusercontent.com/NelsonUrrutia/cherry-files-toolkit/main/assets/banner.svg)
 
-![Cherry Files Toolkit Screens: welcome, diff, picker](https://raw.githubusercontent.com/NelsonUrrutia/cherry-files-toolkit/main/assets/cherry-files-toolkit-banner.png)
+![Cherry Files Toolkit Screens: welcome, diff, picker](https://raw.githubusercontent.com/NelsonUrrutia/cherry-files-toolkit/main/assets/cft-banner-v-3.png)
 
 > A terminal UI (built with [Textual](https://textual.textualize.io/)) for moving
 > work between git branches at the **file** level — pick the final state of the
